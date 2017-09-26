@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-package org.whiteshield-inc;
+package org.whiteshieldinc;
 
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
