@@ -106,7 +106,6 @@ def containerBuildPub(Map args) {
 
     docker.withRegistry("https://${args.host}", "${args.auth_id}") {
 
-        // def img = docker.build("${args.acct}/${args.repo}", args.dockerfile)
         def img = docker.image("${args.acct}/${args.repo}")
         sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t ${args.acct}/${args.repo} ${args.dockerfile}"
         for (int i = 0; i < args.tags.size(); i++) {
@@ -121,14 +120,11 @@ def getContainerTags(config, Map tags = [:]) {
 
     println "getting list of tags for container"
     def String commit_tag
-    def String version_tag
 
     try {
         // if PR branch tag with only branch name
-        if (env.BRANCH_NAME.contains('PR')) {
-            commit_tag = env.BRANCH_NAME
-            tags << ['commit': commit_tag]
-            return tags
+        if (env.BRANCH_NAME != 'master') {
+            tags << ['branch': env.BRANCH_NAME]
         }
     } catch (Exception e) {
         println "WARNING: commit unavailable from env. ${e}"
