@@ -96,7 +96,7 @@ def containerBuildPub(Map args) {
 
         def img = docker.image("${args.acct}/${args.repo}")
         def tag = args.tags.get(0)
-        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${args.acct}/${args.repo}:${tag}' ${args.dockerfile}"
+        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${args.host}/${args.acct}/${args.repo}:${tag}' ${args.dockerfile}"
 
         for (int i = 1; i < args.tags.size(); i++) {
             img.push(args.tags.get(i))
@@ -151,14 +151,14 @@ def getContainerTags(config, Map tags = [:]) {
         }
     }
 
+    def entries = []
     def tag_list = []
-    def map_values = []
 
-    tag_list.addAll(tags.entrySet())
+    entries.addAll(tags.entrySet())
 
-    for (int i=0; i < tag_list.size(); i++){
-        String value =  tag_list.get(i).value
-        map_values.add(value.replace("features/", ""))
+    for (int i=0; i < entries.size(); i++){
+        String value =  entries.get(i).value
+        tag_list.add(value.replace("features/", ""))
     }
 
     return tag_list
