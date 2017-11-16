@@ -149,7 +149,17 @@ def getContainerTags(config, Map tags = [:]) {
         }
     }
 
-    return tags
+    def tag_list = []
+    def map_values = []
+
+    tag_list.addAll(tags.entrySet())
+
+    for (int i=0; i < tag_list.size(); i++){
+        String value =  tag_list.get(i).value
+        map_values.add(value.replace("features/", ""))
+    }
+
+    return tag_list
 }
 
 def getContainerRepoAcct(config) {
@@ -164,20 +174,4 @@ def getContainerRepoAcct(config) {
     }
 
     return acct
-}
-
-@NonCPS
-def getMapValues(Map map=[:]) {
-    // jenkins and workflow restriction force this function instead of map.values(): https://issues.jenkins-ci.org/browse/JENKINS-27421
-    def entries = []
-    def map_values = []
-
-    entries.addAll(map.entrySet())
-
-    for (int i=0; i < entries.size(); i++){
-        String value =  entries.get(i).value
-        map_values.add(value)
-    }
-
-    return map_values
 }
