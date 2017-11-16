@@ -94,9 +94,12 @@ def containerBuildPub(Map args) {
 
     docker.withRegistry("https://${args.host}", "${args.auth_id}") {
 
-        def img = docker.image("${args.acct}/${args.repo}")
-        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t ${args.acct}/${args.repo} ${args.dockerfile}"
-        for (int i = 0; i < args.tags.size(); i++) {
+        def tag = args.tags.get(0)
+        def name = "${args.host}/${args.acct}/${args.repo}:${tag}"
+        def img = docker.image(name)
+        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${name}' ${args.dockerfile}"
+
+        for (int i = 1; i < args.tags.size(); i++) {
             img.push(args.tags.get(i))
         }
 
@@ -110,16 +113,6 @@ def getContainerTags(config, Map tags = [:]) {
     def String commit_tag
 
     try {
-        // if PR branch tag with only branch name
-        if (env.BRANCH_NAME != 'master') {
-            tags << ['branch': env.BRANCH_NAME]
-        }
-    } catch (Exception e) {
-        println "WARNING: commit unavailable from env. ${e}"
-    }
-
-    // commit tag
-    try {
         // if branch available, use as prefix, otherwise only commit hash
         if (env.BRANCH_NAME) {
             commit_tag = env.BRANCH_NAME + '-' + env.GIT_COMMIT_ID.substring(0, 7)
@@ -131,13 +124,14 @@ def getContainerTags(config, Map tags = [:]) {
         println "WARNING: commit unavailable from env. ${e}"
     }
 
-    // master tag
     try {
-        if (env.BRANCH_NAME == 'master') {
+        if (env.BRANCH_NAME != 'master') {
+            tags << ['branch': env.BRANCH_NAME]
+        } else {
             tags << ['master': 'latest']
         }
     } catch (Exception e) {
-        println "WARNING: branch unavailable from env. ${e}"
+        println "WARNING: commit unavailable from env. ${e}"
     }
 
     // build tag only if none of the above are available
@@ -149,7 +143,17 @@ def getContainerTags(config, Map tags = [:]) {
         }
     }
 
-    return tags
+    def entries = []
+    def tag_list = []
+
+    entries.addAll(tags.entrySet())
+
+    for (int i=0; i < entries.size(); i++){
+        String value =  entries.get(i).value
+        tag_list.add(value.replace("features/", ""))
+    }
+
+    return tag_list
 }
 
 def getContainerRepoAcct(config) {
@@ -164,20 +168,4 @@ def getContainerRepoAcct(config) {
     }
 
     return acct
-}
-
-@NonCPS
-def getMapValues(Map map=[:]) {
-    // jenkins and workflow restriction force this function instead of map.values(): https://issues.jenkins-ci.org/browse/JENKINS-27421
-    def entries = []
-    def map_values = []
-
-    entries.addAll(map.entrySet())
-
-    for (int i=0; i < entries.size(); i++){
-        String value =  entries.get(i).value
-        map_values.add(value)
-    }
-
-    return map_values
 }
