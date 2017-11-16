@@ -94,9 +94,10 @@ def containerBuildPub(Map args) {
 
     docker.withRegistry("https://${args.host}", "${args.auth_id}") {
 
-        def img = docker.image("${args.acct}/${args.repo}")
         def tag = args.tags.get(0)
-        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${args.host}/${args.acct}/${args.repo}:${tag}' ${args.dockerfile}"
+        def name = "${args.host}/${args.acct}/${args.repo}:${tag}"
+        def img = docker.image(name)
+        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${name}' ${args.dockerfile}"
 
         for (int i = 1; i < args.tags.size(); i++) {
             img.push(args.tags.get(i))
