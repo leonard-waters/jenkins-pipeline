@@ -47,7 +47,7 @@ def helmDeploy(Map args) {
 }
 
 def helmDelete(Map args) {
-        sh "helm delete ${args.name}"
+    sh "helm delete --timeout 300 --purge ${args.name}"
 }
 
 def helmTest(Map args) {
