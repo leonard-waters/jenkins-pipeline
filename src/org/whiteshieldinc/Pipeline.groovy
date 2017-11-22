@@ -112,17 +112,19 @@ def getContainerTags(config, Map tags = [:]) {
     println "getting list of tags for container"
     def String commit_tag
 
-    try {
-        // if branch available, use as prefix, otherwise only commit hash
-        if (env.BRANCH_NAME) {
-            commit_tag = env.BRANCH_NAME + '-' + env.GIT_COMMIT_ID.substring(0, 7)
-        } else {
-            commit_tag = env.GIT_COMMIT_ID.substring(0, 7)
-        }
-        tags << ['commit': commit_tag]
-    } catch (Exception e) {
-        println "WARNING: commit unavailable from env. ${e}"
-    }
+    // Commented out until this PR is merged in and a new version of the plugin is available
+    // https://github.com/jenkinsci/docker-workflow-plugin/pull/122
+    // try {
+    //     // if branch available, use as prefix, otherwise only commit hash
+    //     if (env.BRANCH_NAME) {
+    //         commit_tag = env.BRANCH_NAME + '-' + env.GIT_COMMIT_ID.substring(0, 7)
+    //     } else {
+    //         commit_tag = env.GIT_COMMIT_ID.substring(0, 7)
+    //     }
+    //     tags << ['commit': commit_tag]
+    // } catch (Exception e) {
+    //     println "WARNING: commit unavailable from env. ${e}"
+    // }
 
     try {
         if (env.BRANCH_NAME != 'master') {
