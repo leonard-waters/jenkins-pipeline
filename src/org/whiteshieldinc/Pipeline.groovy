@@ -3,23 +3,19 @@ package org.whiteshieldinc;
 
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
-    println "checking kubectl connnectivity to the API"
     sh "kubectl get nodes"
 
 }
 
 def helmLint(String chart_dir) {
     // lint helm chart
-    println "running helm lint ${chart_dir}"
     sh "helm lint ${chart_dir}"
 
 }
 
 def helmConfig() {
     //setup helm connectivity to Kubernetes API and Tiller
-    println "initiliazing helm client"
     sh "helm init"
-    println "checking client/server version"
     sh "helm version"
 }
 
@@ -38,12 +34,8 @@ def helmDeploy(Map args) {
     }
 
     if (args.dry_run) {
-        println "Running dry-run deployment"
-
         sh "helm upgrade --dry-run --install ${args.name} ${args.chart_dir} --set imageTag=${args.version_tag},replicas=${args.replicas},cpu=${args.cpu},memory=${args.memory},ingress.hostname=${args.hostname} --namespace=${namespace}"
     } else {
-        println "Running deployment"
-
         // reimplement --wait once it works reliable
         sh "helm upgrade --install ${args.name} ${args.chart_dir} --set imageTag=${args.version_tag},replicas=${args.replicas},cpu=${args.cpu},memory=${args.memory},ingress.hostname=${args.hostname} --namespace=${namespace}"
 
@@ -55,21 +47,15 @@ def helmDeploy(Map args) {
 }
 
 def helmDelete(Map args) {
-        println "Running helm delete ${args.name}"
-
         sh "helm delete ${args.name}"
 }
 
 def helmTest(Map args) {
-    println "Running Helm test"
-
     sh "helm test ${args.name} --cleanup"
 }
 
 def gitEnvVars() {
     // create git envvars
-    println "Setting envvars to tag container"
-
     sh 'git rev-parse HEAD > git_commit_id.txt'
     try {
         env.GIT_COMMIT_ID = readFile('git_commit_id.txt').trim()
@@ -77,7 +63,6 @@ def gitEnvVars() {
     } catch (e) {
         error "${e}"
     }
-    println "env.GIT_COMMIT_ID ==> ${env.GIT_COMMIT_ID}"
 
     sh 'git config --get remote.origin.url> git_remote_origin_url.txt'
     try {
@@ -85,11 +70,9 @@ def gitEnvVars() {
     } catch (e) {
         error "${e}"
     }
-    println "env.GIT_REMOTE_URL ==> ${env.GIT_REMOTE_URL}"
 }
 
 def containerBuildPub(Map args) {
-
     println "Running Docker build/publish: ${args.host}/${args.acct}/${args.repo}:${args.tags}"
 
     docker.withRegistry("https://${args.host}", "${args.auth_id}") {
@@ -109,7 +92,6 @@ def containerBuildPub(Map args) {
 
 def getContainerTags(config, Map tags = [:]) {
 
-    println "getting list of tags for container"
     def String commit_tag
 
     try {
@@ -157,8 +139,6 @@ def getContainerTags(config, Map tags = [:]) {
 }
 
 def getContainerRepoAcct(config) {
-
-    println "setting container registry creds according to Jenkinsfile.json"
     def String acct
 
     if (env.BRANCH_NAME == 'master') {
