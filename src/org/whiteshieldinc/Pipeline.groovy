@@ -132,7 +132,7 @@ def getContainerTags(config, Map tags = [:]) {
 
     for (int i=0; i < entries.size(); i++){
         String value =  entries.get(i).value
-        tag_list.add(value.replace("features/", ""))
+        tag_list.add(value.replaceFirst(/^[a-z]*\//, ""))
     }
 
     return tag_list
