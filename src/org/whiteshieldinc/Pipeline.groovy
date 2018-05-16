@@ -34,10 +34,22 @@ def helmDeploy(Map args) {
     }
 
     if (args.dry_run) {
-        sh "helm upgrade --dry-run --install ${args.name} ${args.chart_dir} --set imageTag=${args.version_tag},replicas=${args.replicas},cpu=${args.cpu},memory=${args.memory},ingress.hostname=${args.hostname} --namespace=${namespace}"
+        sh "helm upgrade --dry-run --install ${args.name} ${args.chart_dir} \\
+                --set imageTag=${args.version_tag} \\
+                --set replicas=${args.replicas} \\
+                --set cpu=${args.cpu} \\
+                --set memory=${args.memory} \\
+                --set ingress.hostname=${args.hostname} \\
+                --namespace=${namespace}"
     } else {
         // reimplement --wait once it works reliable
-        sh "helm upgrade --install ${args.name} ${args.chart_dir} --set imageTag=${args.version_tag},replicas=${args.replicas},cpu=${args.cpu},memory=${args.memory},ingress.hostname=${args.hostname} --namespace=${namespace}"
+        sh "helm upgrade --install ${args.name} ${args.chart_dir} \\
+                --set imageTag=${args.version_tag} \\
+                --set replicas=${args.replicas} \\
+                --set cpu=${args.cpu} \\
+                --set memory=${args.memory} \\
+                --set ingress.hostname=${args.hostname} \\
+                --namespace=${namespace}"
 
         // sleeping until --wait works reliably
         sleep(20)
@@ -80,7 +92,14 @@ def containerBuildPub(Map args) {
         def tag = args.tags.get(0)
         def name = "${args.host}/${args.acct}/${args.repo}:${tag}"
         def img = docker.image(name)
-        sh "docker build --build-arg VCS_REF=${env.GIT_SHA} --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` -t '${name}' ${args.dockerfile}"
+        def deployEnv = args.deploy_env || "prod"
+
+        sh """
+        docker build --build-arg VCS_REF=${env.GIT_SHA} \\
+            --build-arg BUILD_DATE=`date -u +'%Y-%m-%dT%H:%M:%SZ'` \\
+            --build-arg DEPLOY_ENV=${deploy_env} \\
+            -t '${name}' ${args.dockerfile}
+        """
 
         for (int i = 0; i < args.tags.size(); i++) {
             img.push(args.tags.get(i))
@@ -101,6 +120,7 @@ def getContainerTags(config, Map tags = [:]) {
         } else {
             commit_tag = env.GIT_COMMIT_ID.substring(0, 7)
         }
+        
         tags << ['commit': commit_tag]
     } catch (Exception e) {
         println "WARNING: commit unavailable from env. ${e}"
