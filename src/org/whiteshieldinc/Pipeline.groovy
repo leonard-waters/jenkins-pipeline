@@ -4,13 +4,11 @@ package org.whiteshieldinc;
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
     sh "kubectl get nodes"
-
 }
 
 def helmLint(String chart_dir) {
     // lint helm chart
     sh "helm lint ${chart_dir}"
-
 }
 
 def helmConfig() {
