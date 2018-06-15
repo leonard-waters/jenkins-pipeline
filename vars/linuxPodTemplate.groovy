@@ -17,7 +17,7 @@ def call(Map params = [:], body) {
   def volumes             = []
   def workspaceVolume     = []
 
-  def nodeSelector  = 'Role: Application.Linux'
+  def nodeSelector  = 'Role=Application.Linux'
   def jnlpImage     = 'jenkinsci/jnlp-slave:3.19-1-alpine'
   def dockerImage   = 'docker:18.03'
   def helmImage     = 'campbelldgunn/k8s-helm:v2.9.0'
