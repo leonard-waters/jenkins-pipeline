@@ -18,17 +18,15 @@ def getBranch() {
 def getContainerTags(config, Map tags = [:]) {
     def String commit_tag
 
-    println "Branch Name is: ${env.BRANCH_NAME}"
+    gitEnvVars()
 
-    println "GIT COMMIT ID is: ${env.GIT_COMMIT_ID}"
-
-    def get_branch = getBranch()
+    def current_branch = getBranch()
     println "Result of getBranch func is: ${get_branch}"
 
     try {
         // if branch available, use as prefix, otherwise only commit hash
-        if (env.BRANCH_NAME) {
-            commit_tag = env.BRANCH_NAME + '-' + env.GIT_COMMIT_ID.substring(0, 7)
+        if (current_branch) {
+            commit_tag = current_branch + '-' + env.GIT_COMMIT_ID.substring(0, 7)
         } else {
             commit_tag = env.GIT_COMMIT_ID.substring(0, 7)
         }
@@ -101,12 +99,15 @@ def gitEnvVars() {
     // create git envvars
     try {
         env.GIT_COMMIT_ID = sh(script: 'git rev-parse --short HEAD', returnStdout: true).toString().trim()
+
+        println "Commit ID is: ${env.GIT_COMMIT_ID}"
     } catch (e) {
         error "${e}"
     }
 
     try {
         env.GIT_REMOTE_URL = sh(script: 'git config --get remote.origin.url', returnStdout: true).toString().trim()
+        println "Remote URL is: ${env.GIT_REMOTE_URL}"
     } catch (e) {
         error "${e}"
     }
