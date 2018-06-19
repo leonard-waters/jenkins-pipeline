@@ -1,4 +1,5 @@
 #!/usr/bin/groovy
+//This template is very specific to React applications with Webpack
 def call(Map config = [:], List tags = [], String acct = '', body) {
   stage('install dependencies') {
     container('nodejs-build') {
