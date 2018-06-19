@@ -21,7 +21,7 @@ def getContainerTags(config, Map tags = [:]) {
     gitEnvVars()
 
     def current_branch = getBranch()
-    println "Result of getBranch func is: ${get_branch}"
+    println "Result of getBranch func is: ${current_branch}"
 
     try {
         // if branch available, use as prefix, otherwise only commit hash
