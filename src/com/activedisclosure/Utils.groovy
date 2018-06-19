@@ -18,6 +18,13 @@ def getBranch() {
 def getContainerTags(config, Map tags = [:]) {
     def String commit_tag
 
+    println "Branch Name is: ${env.BRANCH_NAME}"
+
+    println "GIT COMMIT ID is: ${env.GIT_COMMIT_ID}"
+
+    def get_branch = getBranch()
+    println "Result of getBranch func is: ${get_branch}"
+
     try {
         // if branch available, use as prefix, otherwise only commit hash
         if (env.BRANCH_NAME) {
