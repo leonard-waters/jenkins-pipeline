@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-def call(Map config, List tags, String acct. body) {
+def call(Map config, List tags, String acct, body) {
   //TODO:
   //Implement Service Now portion
   //If test deployment do not run service now
