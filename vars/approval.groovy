@@ -7,9 +7,9 @@ def call(body) {
   body.delegate = config
   body()
 
-  def message = config.message ?: 'Approve for Production Deployment?'
-  def okText = config.okText ?: 'Deploy'
-  def timeoutTime = config.timeoutTime ?: 20
+  def message     = config.message      ?: 'Approve for Production Deployment?'
+  def okText      = config.okText       ?: 'Deploy'
+  def timeoutTime = config.timeoutTime  ?: 20
 
   timeout(time: timeoutTime, unit: 'MINUTES') {
     input(message: message, ok: okText)
