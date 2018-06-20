@@ -1,5 +1,5 @@
 #!/usr/bin/groovy
-def call(Map config, String version_tag) {
+def call(Map config, String version_tag, body) {
   def utils = new com.activedisclosure.Utils()
 
   def hostname  = config.app.hostname
@@ -39,4 +39,6 @@ def call(Map config, String version_tag) {
       utils.helmDelete(name)
     }
   }
+
+  body()
 }
