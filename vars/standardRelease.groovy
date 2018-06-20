@@ -1,5 +1,9 @@
 #!/usr/bin/groovy
 def call(Map config, String version_tag, body) {
+  //TODO:
+  //Implement Service Now portion
+  //If test deployment do not run service now
+  
   def utils = new com.activedisclosure.Utils()
 
   def hostname  = config.app.hostname
