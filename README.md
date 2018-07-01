@@ -30,9 +30,9 @@ stage('approve to production') {
 
 Default values:
 
-- message: ***Approve for Production Deployment?***
-- okText: ***Deploy***
-- timeoutTime: ***10*** (this is in minutes)
+- message: `Approve for Production Deployment?`
+- okText: `Deploy`
+- timeoutTime: `10` (this is in minutes)
 
 ### Standard Release
 
@@ -57,7 +57,7 @@ def utils = new com.activedisclosure.Utils()
 
 #### Parse Configuration
 
-This function takes a given config file path and returns a `map` of the data
+This function takes a given [config file](#config-file) path and returns a `map` of the data
 
 ``` groovy
 utils.parseConfig('Jenkinsfile.json')
@@ -107,7 +107,7 @@ podTemplate(label: label, nodeSelector: 'beta.kubernetes.io/os=linux',
       containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave:3.19-1-alpine'),
       containerTemplate(name: 'docker', image: 'docker:18.03'),
       containerTemplate(name: 'golang-build', image: 'golang:1.10.3-alpine3.7'),
-      containerTemplate(name: 'helm', image: 'campbelldgunn/k8s-helm:v2.9.0')
+      containerTemplate(name: 'helm', image: 'dfs-activedisclosure/k8s-helm:v2.9.0')
   ],
   volumes:[
       hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
@@ -147,5 +147,66 @@ Currently (6/29/2018) all other templates build off the `linuxTemplate`
 ### Coming Soon to a library near you`!`
 
 - DotNetCore 2.0 (`netcoreTemplate`)
+
+## Config File
+
+Every Jenkinsfile should have an accompanying configration `JSON` file.
+
+It should be in the following format:
+
+```JSON
+{
+  "app": {
+    "name": "org-broker",
+    "namespace": "compliance",
+    "replicas": "3",
+    "cpu": "10m",
+    "memory": "128Mi",
+    "hostname": "org-broker.activedisclosure.com"
+  },
+  "container_repo": {
+    "host": "adacr.azurecr.io",
+    "master_acct": "compliance",
+    "alt_acct": "compliance",
+    "jenkins_creds_id": "adacr_creds",
+    "repo": "org-broker",
+    "dockeremail": ".",
+    "dockerfile": "./"
+  }
+}
+```
+
+The `app` object ***must*** contain:
+
+- name
+  - `name` is the name of the project as it will be seen in kubernetes
+- namespace
+  - `namespace` is a scope for `names` and defines the *"virtual clusters"*
+  - examples: `compliance`, `activelink`, `kube0-system`
+- hostname
+  - The `hostname` is the hostname for the project, how it can be reached from outside the cluster or internally
+  - examples: `https://broker.activedisclosure.com`,`redis-svc.cluster.local`
+
+Optional are:
+
+- replicas (default: `3`)
+  - `Replicas` are the number of `pods` desired to have running at all times
+- cpu (default: `10m`)
+  - `CPU` is the maximum amount of `millicpu` available for the `container`
+- memory (default: `128Mi`)
+  - `Memory` is measured in `MebiBytes` and will be the maximum available to the `container`
+
+The `container_repo` requires the following:
+
+- host
+- master_acct
+- jenkins_creds_id
+- repo
+
+Optional are:
+
+- alt_acct
+- dockeremail
+- dockerfile (default path: `./`)
 
 ## This pipeline library is heavily inspired by [Fabric8io's Pipeline Library](https://github.com/fabric8io/fabric8-pipeline-library)
