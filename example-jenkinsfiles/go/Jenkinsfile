@@ -1,0 +1,52 @@
+@Library('github.com/leonard-waters/jenkins-pipeline@pipeline-v2')
+def utils = new com.activedisclosure.Utils()
+
+goTemplate {
+  def buildPath = "/home/jenkins/go/src/github.com/dfs-activedisclosure/office-transformers"
+  dir(buildPath) {
+    stage('checkout code') {
+      checkout scm
+    }
+
+    def Map config  = utils.parseConfig('Jenkinsfile.json')
+    def String acct = utils.getContainerRepoAcct(config)
+    def List tags   = utils.getContainerTags(config)
+
+    container('golang-build') {
+      stage('install dependencies') {
+          sh 'go version'
+          sh 'go get -u golang.org/x/lint/golint'
+          sh 'go get -u github.com/golang/dep/cmd/dep'
+        }
+
+      stage('format') {
+        // point to lint script, govet
+        //sh 'gofmt'
+      }
+
+      stage('lint') {
+        // point to lint script, govet
+        //sh 'go run '
+      }
+
+      stage('test') {
+        // point to test script, code coverage
+        //sh 'go test'
+      }
+
+      stage('build release') {
+        sh 'cd ${GOPATH}/src/github/office-transformers && dep ensure'
+        sh 'cd ${GOPATH}/src/github/office-transformers && env GOARCH=amd64 GOOS=linux go build -o transformers main.go'
+      }
+    }
+  
+    stage('validate helm chart') {
+      def version_tag = tags.get(0)
+      helmValidate(config, version_tag)
+    }
+
+    stage('docker build and publish') {
+      dockerBuildAndPublish(config, tags, acct)
+    }
+  }
+}

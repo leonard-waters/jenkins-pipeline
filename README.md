@@ -1,6 +1,6 @@
 # DFS Pipeline Library
 
-This git repository contains a library of reusable [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) steps and functions that can be used in your Jenkinsfile to help improve your Continuous Integration and Continuous Delivery pipeline.
+This repository contains a library of reusable [Jenkins Pipeline](https://jenkins.io/doc/book/pipeline/) steps and functions that can be used in your Jenkinsfile to help improve your Continuous Integration and Continuous Delivery pipeline.
 
 ## How to use this library
 
@@ -194,7 +194,7 @@ Optional are:
 - cpu (default: `10m`)
   - `CPU` is the maximum amount of `millicpu` available for the `container`
 - memory (default: `128Mi`)
-  - `Memory` is measured in `MebiBytes` and will be the maximum available to the `container`
+  - `Memory` is measured in `mebibytes` and will be the maximum available to the `container`
 
 The `container_repo` requires the following:
 

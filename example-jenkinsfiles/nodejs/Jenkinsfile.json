@@ -1,0 +1,18 @@
+{
+  "app": {
+    "name": "excel-addin",
+    "namespace": "activelink",
+    "replicas": "3",
+    "cpu": "100m",
+    "memory": "512Mi",
+    "hostname": "office-addin.activedisclosure.com"
+  },
+  "container_repo": {
+    "host": "adacr.azurecr.io",
+    "master_acct": "activelink",
+    "jenkins_creds_id": "adacr_creds",
+    "repo": "office-addin",
+    "dockeremail": ".",
+    "dockerfile": "./"
+  }
+}
